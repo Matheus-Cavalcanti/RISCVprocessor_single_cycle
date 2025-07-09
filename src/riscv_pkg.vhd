@@ -45,37 +45,56 @@ PACKAGE riscv_pkg IS
 	
 	CONSTANT ZERO_VECTOR : BIT_VECTOR(RISCV_Data_Width-1 DOWNTO 0) := (OTHERS => '0'); -- null vector for comparison
 	
-	COMPONENT mux2 PORT (d0, d1 : IN BIT_VECTOR(RISCV_Data_Width-1 DOWNTO 0);
-								s		 : IN BIT;
-								y		 : OUT BIT_VECTOR(RISCV_Data_Width-1 DOWNTO 0));
+	COMPONENT mux2
+	GENERIC (width  : INTEGER);
+	PORT	  (d0, d1 : IN BIT_VECTOR(RISCV_Data_Width-1 DOWNTO 0);
+				s		 : IN BIT;
+				y		 : OUT BIT_VECTOR(RISCV_Data_Width-1 DOWNTO 0));
 	END COMPONENT;
 	
-	COMPONENT mux3 PORT (d0, d1, d2 : IN BIT_VECTOR(RISCV_Data_Width-1 DOWNTO 0);
-								s0, s1 	  : IN BIT;
-								y		 	  : OUT BIT_VECTOR(RISCV_Data_Width-1 DOWNTO 0));
+	COMPONENT mux3
+	GENERIC (width		  : INTEGER);
+	PORT	  (d0, d1, d2 : IN BIT_VECTOR(RISCV_Data_Width-1 DOWNTO 0);
+				s0, s1 	  : IN BIT;
+				y		 	  : OUT BIT_VECTOR(RISCV_Data_Width-1 DOWNTO 0));
 	END COMPONENT;
 	
-	COMPONENT flopr PORT (d				: IN BIT_VECTOR(RISCV_Data_Width-1 DOWNTO 0);
-								 clk, reset : IN BIT; 
-								 q			   : OUT BIT_VECTOR(RISCV_Data_Width-1 DOWNTO 0));
+	COMPONENT flopr
+	GENERIC (width		  : INTEGER);
+	PORT	  (d			  : IN BIT_VECTOR(RISCV_Data_Width-1 DOWNTO 0);
+				clk, reset : IN BIT; 
+				q			  : OUT BIT_VECTOR(RISCV_Data_Width-1 DOWNTO 0));
 	END COMPONENT;
 	
-	COMPONENT adder PORT (a, b : IN BIT_VECTOR (RISCV_Data_Width-1 DOWNTO 0);
-								 cin	: IN BIT;
-								 y		: OUT BIT_VECTOR (RISCV_Data_Width-1 DOWNTO 0);
-								 cout : OUT BIT );
+	COMPONENT flopenr
+   GENERIC (width 			: INTEGER);
+   PORT	  (d					: IN BIT_VECTOR(RISCV_Data_Width-1 DOWNTO 0);
+				clk, reset, en : IN BIT; 
+				q			   	: OUT BIT_VECTOR(RISCV_Data_Width-1 DOWNTO 0));
 	END COMPONENT;
 	
-	COMPONENT alu PORT (A, B 		 : IN BIT_VECTOR (RISCV_Data_Width-1 DOWNTO 0);
-							  ALUControl : IN BIT_VECTOR (2 DOWNTO 0);
-							  Result	    : BUFFER BIT_VECTOR (RISCV_Data_Width-1 DOWNTO 0);
-							  Zero		 : OUT BIT);
+	COMPONENT adder 
+	GENERIC (width : INTEGER);
+	PORT	  (a, b  : IN BIT_VECTOR (RISCV_Data_Width-1 DOWNTO 0);
+				cin	: IN BIT;
+				y		: OUT BIT_VECTOR (RISCV_Data_Width-1 DOWNTO 0);
+				cout  : OUT BIT );
 	END COMPONENT;
 	
-	COMPONENT regfile PORT (A1, A2, A3 : IN BIT_VECTOR(4 DOWNTO 0); 
-									WD3		  : IN BIT_VECTOR(RISCV_Data_Width-1 DOWNTO 0);
-									WE3, clk	  : IN BIT;
-									RD1,RD2	  : OUT BIT_VECTOR(RISCV_Data_Width-1 DOWNTO 0));
+	COMPONENT alu 
+	GENERIC (width		  : INTEGER);
+	PORT	  (A, B 		  : IN BIT_VECTOR (RISCV_Data_Width-1 DOWNTO 0);
+				ALUControl : IN BIT_VECTOR (2 DOWNTO 0);
+				Result	  : BUFFER BIT_VECTOR (RISCV_Data_Width-1 DOWNTO 0);
+				Zero		  : OUT BIT);
+	END COMPONENT;
+	
+	COMPONENT regfile 
+	GENERIC (width		  : INTEGER);
+	PORT	  (A1, A2, A3 : IN BIT_VECTOR(4 DOWNTO 0); 
+				WD3		  : IN BIT_VECTOR(RISCV_Data_Width-1 DOWNTO 0);
+				WE3, clk	  : IN BIT;
+				RD1,RD2	  : OUT BIT_VECTOR(RISCV_Data_Width-1 DOWNTO 0));
 	END COMPONENT;
 	
 	COMPONENT extend PORT (immsrc  : IN  BIT_VECTOR(1 DOWNTO 0);
