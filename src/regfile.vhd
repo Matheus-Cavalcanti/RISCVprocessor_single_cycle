@@ -32,12 +32,10 @@
 -------------------------------------------------------------------------------
 
 LIBRARY bibli_1;
-USE bibli_1.riscv_pkg.RISCV_Data_Width;
-USE bibli_1.riscv_pkg.flopr;
-USE bibli_1.riscv_pkg.BTOI;
+USE bibli_1.riscv_pkg.ALL;
 
 ENTITY regfile IS
-	GENERIC (N			  : INTEGER := 32); -- n of registers
+	GENERIC (width		  : INTEGER := 32); -- n of registers
 	PORT	  (A1, A2, A3 : IN BIT_VECTOR(4 DOWNTO 0); 
 				WD3		  : IN BIT_VECTOR(RISCV_Data_Width-1 DOWNTO 0);
 				WE3, clk	  : IN BIT;
@@ -45,36 +43,46 @@ ENTITY regfile IS
 END regfile;
 
 ARCHITECTURE logic OF regfile IS
-    TYPE reg_array IS ARRAY (0 TO 31) OF BIT_VECTOR(N-1 DOWNTO 0); -- register array (N bits)
-	 SIGNAL regs : reg_array;
-	 
-	 SIGNAL write_enable : BIT_VECTOR(31 DOWNTO 0);  -- enable signals for each reg
+    TYPE reg_array IS ARRAY (0 TO 31) OF BIT_VECTOR(width-1 DOWNTO 0); -- register array (N bits)
+    SIGNAL regs : reg_array;
+     
+    SIGNAL write_enable_reg : BIT_VECTOR(31 DOWNTO 0);  -- enable signals for each reg
+    
+	COMPONENT flopenr
+   GENERIC (width 			: INTEGER);
+   PORT	  (d					: IN BIT_VECTOR(RISCV_Data_Width-1 DOWNTO 0);
+				clk, reset, en : IN BIT; 
+				q			   	: OUT BIT_VECTOR(RISCV_Data_Width-1 DOWNTO 0));
+	END COMPONENT;
 BEGIN
+
     GEN_REGS: FOR i IN 0 TO 31 GENERATE
         ZERO_REG: IF i = 0 GENERATE
-            regs(0) <= (OTHERS => '0'); -- register 0 is x0 (zero constant)
+            regs(0) <= (OTHERS => '0');
         END GENERATE;
         
         OTHER_REGS: IF i > 0 GENERATE
-            REGX: flopr PORT MAP(
+            REGX: flopenr 
+                GENERIC MAP (width => RISCV_Data_Width)
+                PORT MAP(
                 d     => WD3,
-                clk   => write_enable(i),  -- clock selectively enabled
-                reset => '0',              -- no individual reset
+                clk   => clk, 
+                reset => '0', 
+                en    => write_enable_reg(i),
                 q     => regs(i)
             );
         END GENERATE;
     END GENERATE;
 
-	 -- write control: Enable WE3 only for the target register (A3)
-    WRITE_PROC: PROCESS(WE3, A3)
+    WRITE_CONTROL: PROCESS(WE3, A3)
     BEGIN
-        write_enable <= (OTHERS => '0');  -- disables all by default
+        write_enable_reg <= (OTHERS => '0');
         IF WE3 = '1' THEN
-            write_enable(BTOI(A3)) <= clk;  -- enables only the target register
+            write_enable_reg(BTOI(A3)) <= '1';
         END IF;
-    END PROCESS;
+    END PROCESS WRITE_CONTROL;
 
-    -- asynchronous read
+     -- Leitura assíncrona
     RD1 <= regs(BTOI(A1));
     RD2 <= regs(BTOI(A2));
 
