@@ -1,7 +1,8 @@
 ENTITY flopr IS
-	PORT (d 			  : IN BIT_VECTOR(31 DOWNTO 0);	 --entrada (32 bits)
-			clk, reset : IN BIT; 							 --entradas de controle
-			q			  : OUT BIT_VECTOR(31 DOWNTO 0)); --saida (32 bits)
+	GENERIC (width		  : INTEGER := 32);	
+	PORT	  (d 			  : IN BIT_VECTOR(width-1 DOWNTO 0);	 --entrada (32 bits)
+				clk, reset : IN BIT; 							 --entradas de controle
+				q			  : OUT BIT_VECTOR(width-1 DOWNTO 0)); --saida (32 bits)
 END flopr;
 
 ARCHITECTURE logic OF flopr IS
