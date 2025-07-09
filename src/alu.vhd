@@ -35,20 +35,17 @@
 -------------------------------------------------------------------------------
 
 LIBRARY bibli_1;
-USE bibli_1.riscv_pkg.RISCV_Data_Width;
-USE bibli_1.riscv_pkg."+";
-USE bibli_1.riscv_pkg."-";
+USE bibli_1.riscv_pkg.ALL;
 
 ENTITY alu IS
-	PORT (A, B 		  : IN BIT_VECTOR (RISCV_Data_Width-1 DOWNTO 0);
+	GENERIC (width : INTEGER := 32);
+	PORT (A, B 		  : IN BIT_VECTOR (width-1 DOWNTO 0);
 			ALUControl : IN BIT_VECTOR (2 DOWNTO 0);
-			Result	  : BUFFER BIT_VECTOR (RISCV_Data_Width-1 DOWNTO 0);
+			Result	  : BUFFER BIT_VECTOR (width-1 DOWNTO 0);
 			Zero		  : OUT BIT);
 end alu;
 
 ARCHITECTURE logic OF alu IS
-
-	CONSTANT ZERO_VECTOR : BIT_VECTOR(RISCV_Data_Width-1 DOWNTO 0) := (OTHERS => '0'); -- null vector for comparison
 	
 	FUNCTION SLT (x, y : BIT_VECTOR(RISCV_Data_Width-1 DOWNTO 0)) RETURN BIT_VECTOR IS
 		 VARIABLE r : BIT_VECTOR(RISCV_Data_Width-1 DOWNTO 0) := (OTHERS => '0'); -- result
