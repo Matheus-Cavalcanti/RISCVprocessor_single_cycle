@@ -20,9 +20,9 @@ architecture struct of datapath is
 	end component;
 	component adder
 		port(a, b: in BIT_VECTOR(31 downto 0);
-				cin : IN BIT;
-				y: out BIT_VECTOR(31 downto 0);
-				cout : OUT BIT);
+				cin : in bit;
+				cout : out bit;
+				y: out BIT_VECTOR(31 downto 0));
 	end component;
 	component mux2 generic(width: integer);
 		port(d0, d1: in BIT_VECTOR(width-1 downto 0);
@@ -54,15 +54,14 @@ architecture struct of datapath is
 	end component;
 	
 	signal PCNext, PCPlus4, PCTarget: BIT_VECTOR(31 downto 0);
-
 	signal ImmExt: BIT_VECTOR(31 downto 0);
 	signal SrcA, SrcB: BIT_VECTOR(31 downto 0);
 	signal Result: BIT_VECTOR(31 downto 0);
 begin
 	-- next PC logic
 	pcreg: flopr generic map(32) port map(clk, reset, PCNext, PC);
-	pcadd4: adder port map(a => PC, b=> X"00000004", cin => '0', y => PCPlus4, cout => OPEN);
-	pcaddbranch: adder port map(a => PC, b => ImmExt, cin => '0', y => PCTarget, cout => OPEN);
+	pcadd4: adder port map(a => PC, b => X"00000004", y => PCPlus4, cin => '0', cout => open);
+	pcaddbranch: adder port map(a => PC, b => ImmExt, y => PCTarget, cin => '0', cout => open);
 	pcmux: mux2 generic map(32) port map(PCPlus4, PCTarget, PCSrc,
 											PCNext);
 	-- register file logic
